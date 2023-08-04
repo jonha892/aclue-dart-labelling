@@ -1,0 +1,4 @@
+jupyter
+Pillow
+opencv-python
+numpy
