@@ -5,3 +5,5 @@ venv
 env
 
 data
+dartnet_data
+dartnet_infos.csv
