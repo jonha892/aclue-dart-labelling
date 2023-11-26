@@ -4,7 +4,7 @@
 #
 
 # Check if Jupyter is accessible
-if ! command -v jupyter &> /dev/null; then
+if ! python3 -c "import jupyter" &> /dev/null; then
     echo "Error: no jupyter in PATH, check if env is activated"
     echo "commit interrupted, please try again after fixing the problem"
     exit 1
