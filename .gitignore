@@ -6,4 +6,7 @@ env
 
 data
 dartnet_data
+dartnet_data_yolo
+
+dartnet_data_yolo.zip
 dartnet_infos.csv
