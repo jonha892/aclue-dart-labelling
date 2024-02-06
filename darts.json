@@ -1,0 +1,155 @@
+{
+    "j": [
+        {
+            "path": "res/darts/j_1_1.png",
+            "pos": [
+                42,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/j_1_2.png",
+            "pos": [
+                9,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/j_1_3.png",
+            "pos": [
+                52,
+                2
+            ]
+        },
+        {
+            "path": "res/darts/j_2_1.png",
+            "pos": [
+                32,
+                6
+            ]
+        },
+        {
+            "path": "res/darts/j_2_2.png",
+            "pos": [
+                13,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/j_2_3.png",
+            "pos": [
+                22,
+                6
+            ]
+        },
+        {
+            "path": "res/darts/j_3_1.png",
+            "pos": [
+                25,
+                2
+            ]
+        },
+        {
+            "path": "res/darts/j_3_2.png",
+            "pos": [
+                35,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/j_3_3.png",
+            "pos": [
+                38,
+                7
+            ]
+        }
+    ],
+    "p": [
+        {
+            "path": "res/darts/p_1_1.png",
+            "pos": [
+                27,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/p_1_2.png",
+            "pos": [
+                26,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/p_1_3.png",
+            "pos": [
+                34,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/p_2_1.png",
+            "pos": [
+                45,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/p_2_2.png",
+            "pos": [
+                25,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/p_2_3.png",
+            "pos": [
+                33,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/p_3_1.png",
+            "pos": [
+                18,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/p_3_2.png",
+            "pos": [
+                12,
+                0
+            ]
+        },
+        {
+            "path": "res/darts/p_3_3.png",
+            "pos": [
+                52,
+                0
+            ]
+        }
+    ],
+    "red": [
+        {
+            "path": "res/darts/dart_1.png",
+            "pos": [
+                111,
+                19
+            ]
+        },
+        {
+            "path": "res/darts/dart_2.png",
+            "pos": [
+                97,
+                39
+            ]
+        },
+        {
+            "path": "res/darts/dart_3.png",
+            "pos": [
+                40,
+                28
+            ]
+        }
+    ]
+}
