@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 import math
 import random
-from typing import Tuple
+from typing import List, Tuple
+import os
 
 from PIL import Image
 
@@ -37,13 +38,13 @@ class OutLabel:
 @dataclass
 class DartConfig:
     id: int
-    darts: [Image]
+    darts: List[Tuple[Image.Image, Tuple[int, int]]]
 
 
 @dataclass
 class DataGenerationConfig:
-    position_config: dict
-    number_of_throw: int
+    number_of_throw_sequences: int
+    position_configs: Tuple[dict[str, any], dict[str, any], dict[str, any]]
 
 
 class PositionGenerator:
@@ -65,11 +66,11 @@ class PositionGenerator:
 
         self.bounds_offset = bounds_offset
 
-        total_width = (anchor_right.x - anchor_left.x)
-        total_height = (anchor_bottom.y - anchor_top.y)
+        total_width = anchor_right.x - anchor_left.x
+        total_height = anchor_bottom.y - anchor_top.y
         self.max_radius = (total_height + total_width) / 4
 
-    def radius_to_bounds(self, radius: float) -> int:
+    def radius_rel_to_abs(self, radius: float) -> int:
         # radius is relative to the center
         if radius > 1 or radius < 0:
             raise ValueError("radius must be between 0 and 1")
@@ -77,11 +78,14 @@ class PositionGenerator:
 
     @staticmethod
     def generate_random_with_radius_at(
-        radius: int, start: Tuple[int, int]
+        radius_abs: int, start: Tuple[int, int]
     ) -> Tuple[int, int]:
         angle = random.random() * 2 * math.pi
-        x = start[0] + radius * math.cos(angle)
-        y = start[1] + radius * math.sin(angle)
+        x = start[0] + radius_abs * math.sin(math.radians(angle))
+        y = start[1] - radius_abs * math.cos(math.radians(angle))
+        x = int(x)
+        y = int(y)
+        print(f'start {start}, generated ({x}{y}) angle {angle} radius {radius_abs}')
         return (x, y)
 
     def generate(self, opt: dict[str, any]) -> Position:
@@ -90,29 +94,28 @@ class PositionGenerator:
             offset = self.bounds_offset
             return Position(
                 random.randint(
-                    self.anchor_left[0] - offset, self.anchor_right[0] + offset
+                    self.anchor_left.x - offset, self.anchor_right.x + offset
                 ),
                 random.randint(
-                    self.anchor_top[1] - offset, self.anchor_bottom[1] + offset
+                    self.anchor_top.y - offset, self.anchor_bottom.y + offset
                 ),
             )
         if type == "radius":
             if (
                 not "radius" in opt
                 or not "angle" in opt
-                or not "selection_radius" in opt
+                or not "selection_radius_abs" in opt
             ):
-                raise ValueError("radius, angle, and selection_radius must be provided")
+                raise ValueError("radius, angle, and selection_radius_abs must be provided")
             radius = opt["radius"]
-            radius = self.radius_to_bounds(radius)
+            radius = self.radius_rel_to_abs(radius)
             angle = opt["angle"]
-            selection_radius = opt["selection_radius"]
-            selection_radius = self.radius_to_bounds(selection_radius)
+            selection_radius_abs = opt["selection_radius_abs"]
 
-            start_x = self.center.x + radius * math.cos(angle)
-            start_y = self.center.y + radius * math.sin(angle)
+            start_x = self.center.x + radius * math.sin(math.radians(angle))
+            start_y = self.center.y - radius * math.cos(math.radians(angle))
             point = self.generate_random_with_radius_at(
-                selection_radius, (start_x, start_y)
+                selection_radius_abs, (start_x, start_y)
             )
             return Position(point[0], point[1])
         else:
@@ -135,29 +138,37 @@ class DataGenerator:
 
     def generate(
         self,
-        position_config: [DataGenerationConfig],
-        darts: DartConfig,
+        position_config: List[DataGenerationConfig],
+        darts: List[DartConfig],
         dartboard: Image,
         out_path: str,
-    ) -> [OutLabel]:
+    ) -> List[OutLabel]:
+        # create dir if not exist
+        if not os.path.exists(out_path):
+            os.makedirs(out_path)
+        padding = len(str(len(position_config) -1))
+
         out_labels = []
 
-        for config in position_config:
-            print("processing config: ", config)
-            for i in range(config.number_of_throw):
-                print("processing throw: ", i)
+        for c, config in enumerate(position_config):
+            print(f'{c} - position config: {config.position_configs}')
+            for i in range(config.number_of_throw_sequences):
+                print("processing throw sequence: ", i)
 
-                # select dart randomly
-                dart_config = darts[random.randint(0, len(self.darts) - 1)]
-                darts = random.sample(dart_config.darts, 3)
+                # select dart type for throw sequence
+                dart_config = darts[random.randint(0, len(darts) - 1)]
+                selected_darts = random.sample(dart_config.darts, 3)
 
                 tmp_annotations = []
-                for dart, j in enumerate(darts):
-                    position = self.position_generator.generate(config.position_config)
-                    composite_at(dartboard, dart, position)
-                    dart_out_path = f"{out_path}/dart_{i}_{j}.png"
-                    dart.save(dart_out_path)
+                composite = dartboard
+                for j, dart in enumerate(selected_darts):
+                    dart_img, dart_top_pos = dart
+                    position = self.position_generator.generate(config.position_configs[j])
+                    composite = composite_at(composite, dart_img, (position.x, position.y))
+                    dart_out_path = f"{out_path}/dart_{c:0{padding}}_{i:0{2}}_{j}.png"
+                    composite.save(dart_out_path)
 
+                    position = Position(dart_top_pos[0] + position.x, dart_top_pos[1] + position.y)
                     tmp_annotations += [Annotation(position, "dart")]
                     dart_annotations = [*tmp_annotations, *self.anchors]
 
