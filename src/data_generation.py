@@ -20,6 +20,12 @@ class Annotation:
     pos: Position
     label: str
 
+    def to_json(self):
+        return {
+            "pos": self.pos.__dict__,
+            "label": self.label,
+        }
+
 
 @dataclass
 class OutLabel:
@@ -31,7 +37,7 @@ class OutLabel:
         return {
             "image_path": self.image_path,
             "series_id": self.series_id,
-            "annotations": list(map(lambda x: x.__dict__, self.annotations)),
+            "annotations": list(map(lambda x: x.to_json(), self.annotations)),
         }
 
 
@@ -80,7 +86,7 @@ class PositionGenerator:
     def generate_random_with_radius_at(
         radius_abs: int, start: Tuple[int, int]
     ) -> Tuple[int, int]:
-        angle = random.random() * 2 * math.pi
+        angle = int(random.random() * 360)
         x = start[0] + radius_abs * math.sin(math.radians(angle))
         y = start[1] - radius_abs * math.cos(math.radians(angle))
         x = int(x)
@@ -132,7 +138,7 @@ class DataGenerator:
         position_generator,
     ) -> None:
         self.anchors = [anchor_top, anchor_bottom, anchor_left, anchor_right]
-        self.anchors = list(map(lambda x: (x, "anchor"), self.anchors))
+        self.anchors = list(map(lambda x: Annotation(x, "anchor"), self.anchors))
 
         self.position_generator = position_generator
 
