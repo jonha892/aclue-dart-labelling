@@ -30,7 +30,7 @@ class Annotation:
 @dataclass
 class OutLabel:
     image_path: str
-    series_id: int
+    series_id: str
     annotations: [Annotation]
 
     def to_json(self):
@@ -178,5 +178,5 @@ class DataGenerator:
                     tmp_annotations += [Annotation(position, "dart")]
                     dart_annotations = [*tmp_annotations, *self.anchors]
 
-                    out_labels += [OutLabel(dart_out_path, i, dart_annotations)]
+                    out_labels += [OutLabel(dart_out_path, f'{c}_{i}', dart_annotations)]
         return out_labels
